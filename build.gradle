@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+}
+
+group 'com.github.arthurpicht'
+version '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    implementation 'com.github.arthurpicht:utils-core:1.9.0'
+    implementation 'com.github.arthurpicht:utils-io:0.0.12'
+    implementation 'com.github.arthurpicht:processExecutor:0.0.3'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task extractDependencies(type: Copy, dependsOn: jar) {
+    from configurations.runtimeClasspath
+    into "$buildDir/dependencies"
+}
