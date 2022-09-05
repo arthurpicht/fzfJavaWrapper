@@ -1,4 +1,4 @@
-package de.arthurpicht.fzfJavaWrapper;
+package de.arthurpicht.fzfJavaWrapper.exception;
 
 public class FzfRuntimeException extends RuntimeException {
 

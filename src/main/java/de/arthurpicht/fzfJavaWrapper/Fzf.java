@@ -1,5 +1,7 @@
 package de.arthurpicht.fzfJavaWrapper;
 
+import de.arthurpicht.fzfJavaWrapper.exception.FzfRuntimeException;
+import de.arthurpicht.fzfJavaWrapper.exception.InvalidSelectionException;
 import de.arthurpicht.processExecutor.*;
 import de.arthurpicht.processExecutor.outputHandler.StandardErrorCollectionHandler;
 import de.arthurpicht.processExecutor.outputHandler.StandardOutCollectionHandler;
@@ -104,7 +106,7 @@ public class Fzf {
      * @param inputElements input elements to chose from
      * @return chosen element, null is no choice was made
      */
-    public String execute(List<String> inputElements) {
+    public String execute(List<String> inputElements) throws InvalidSelectionException {
 
         TempDir tempDir = createTempDir();
         Path resultFile = tempDir.asPath().resolve("out");
@@ -118,16 +120,14 @@ public class Fzf {
                     getCatInputFileCommand(inputFile) +
                     " | " + getFzfCommand() + " | " +
                     getWriteToTempResultFileCommand(resultFile));
-        } catch (ProcessExecutionException e) {
-            throw new FzfRuntimeException(e.getMessage(), e);
-        } catch (IOException e) {
-            tempDir.remove();
-            throw new FzfRuntimeException(e.getMessage(), e);
-        }
 
-        String result = obtainResult(resultFile);
-        tempDir.remove();
-        return result;
+            return obtainResult(resultFile);
+
+        } catch (ProcessExecutionException | IOException e) {
+            throw new FzfRuntimeException(e.getMessage(), e);
+        } finally {
+            tempDir.remove();
+        }
     }
 
     private TempDir createTempDir() {
@@ -199,21 +199,21 @@ public class Fzf {
         return "cat >'" + tempResultFile.toAbsolutePath() + "'";
     }
 
-    private String obtainResult(Path tempResultFile) {
+    private String obtainResult(Path tempResultFile) throws InvalidSelectionException {
         if (FileUtils.isExistingRegularFile(tempResultFile)) {
             SingleValueFile singleValueFile = new SingleValueFile(tempResultFile);
             try {
                 String value = singleValueFile.read();
                 if (Strings.isUnspecified(value)) {
-                    return null;
+                    throw new InvalidSelectionException();
                 } else {
                     return value;
                 }
             } catch (IOException e) {
-                return null;
+                throw new FzfRuntimeException("Temp file could not be read. " + e.getMessage(), e);
             }
         }
-        return null;
+        throw new FzfRuntimeException("Temp file not found.");
     }
 
 }
