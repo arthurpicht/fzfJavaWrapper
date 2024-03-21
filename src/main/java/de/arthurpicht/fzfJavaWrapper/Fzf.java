@@ -2,19 +2,20 @@ package de.arthurpicht.fzfJavaWrapper;
 
 import de.arthurpicht.fzfJavaWrapper.exception.FzfRuntimeException;
 import de.arthurpicht.fzfJavaWrapper.exception.InvalidSelectionException;
-import de.arthurpicht.processExecutor.*;
+import de.arthurpicht.processExecutor.ProcessExecution;
+import de.arthurpicht.processExecutor.ProcessExecutionException;
+import de.arthurpicht.processExecutor.ProcessExecutor;
+import de.arthurpicht.processExecutor.ProcessExecutorBuilder;
 import de.arthurpicht.processExecutor.outputHandler.StandardErrorCollectionHandler;
 import de.arthurpicht.processExecutor.outputHandler.StandardOutCollectionHandler;
 import de.arthurpicht.utils.core.strings.Strings;
 import de.arthurpicht.utils.io.file.SingleValueFile;
 import de.arthurpicht.utils.io.nio2.FileUtils;
 import de.arthurpicht.utils.io.tempDir.TempDir;
-import de.arthurpicht.utils.io.tempDir.TempDirs;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class Fzf {
@@ -131,25 +132,10 @@ public class Fzf {
     }
 
     private TempDir createTempDir() {
-
-        Path tempParentDir;
-        if (this.tempParentDir != null) {
-            tempParentDir = this.tempParentDir;
-            if (!FileUtils.isExistingDirectory(tempParentDir))
-                throw new FzfRuntimeException("Specified parent directory for temporary files is not existing: "
-                        + tempParentDir.toAbsolutePath());
-            if (!Files.isWritable(tempParentDir))
-                throw new FzfRuntimeException("No write permissions for specified parent for temporary files: "
-                        + tempParentDir.toAbsolutePath());
-        } else {
-            tempParentDir = Paths.get(System.getProperty("user.home"));
-        }
-
-        try {
-            return TempDirs.createUniqueTempDirAutoRemove(tempParentDir);
-        } catch (IOException e) {
-            throw new FzfRuntimeException("Unable to create temporary directory.", e);
-        }
+        TempDir.Creator tempDirCreator = new TempDir.Creator();
+        if (this.tempParentDir != null)
+            tempDirCreator.withParentDir(this.tempParentDir);
+        return tempDirCreator.create();
     }
 
     private void prepareInputFile(List<String> inputElements, Path inputFile) throws IOException {

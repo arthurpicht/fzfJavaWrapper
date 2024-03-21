@@ -103,7 +103,7 @@ public class FzfBuilder {
     }
 
     /**
-     * Use specified directory as parent directory for temporary files. Must exist. Default is user home.
+     * Use specified directory as parent directory for temporary files. Must exist. Default is system temp dir.
      *
      * @param tempParentDir parent directory for temporary files
      * @return current instance of {@link FzfBuilder}
