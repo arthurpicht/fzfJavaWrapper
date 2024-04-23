@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.github.arthurpicht'
-version '0.0.2'
+version '0.0.3'
 
 repositories {
     mavenCentral()
@@ -11,9 +11,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.arthurpicht:utils-core:1.13.0'
+    implementation 'com.github.arthurpicht:utils-core:1.13.1'
     implementation 'com.github.arthurpicht:utils-io:0.0.20'
-    implementation 'com.github.arthurpicht:processExecutor:0.0.5'
+    implementation 'com.github.arthurpicht:processExecutor:0.0.6'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
