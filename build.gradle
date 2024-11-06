@@ -1,26 +1,51 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
-group 'com.github.arthurpicht'
-version '0.0.3'
+group 'de.arthurpicht'
+version '0.0.4'
+def artifact = 'ap-fzf-java-wrapper'
 
 repositories {
+    maven { url "https://raw.githubusercontent.com/arthurpicht/mvn-repo/main/releases"}
     mavenCentral()
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    implementation 'com.github.arthurpicht:utils-core:1.13.1'
-    implementation 'com.github.arthurpicht:utils-io:0.0.20'
-    implementation 'com.github.arthurpicht:processExecutor:0.0.6'
+    implementation 'de.arthurpicht:ap-utils-core:1.19.0'
+    implementation 'de.arthurpicht:ap-utils-io:0.0.23'
+    implementation 'de.arthurpicht:ap-process-executor:0.0.7'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.3'
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 test {
     useJUnitPlatform()
+}
+
+base {
+    archivesName = artifact
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = artifact
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir(project.gradle.gradleUserHomeDir.parent + "/gitrepos/ap/mvn-repo/releases")
+        }
+    }
 }
 
 tasks.register('extractDependencies', Copy) {
